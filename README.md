@@ -19,7 +19,12 @@
 1. create algorithm scaffolding
 2. create research notebook to write pipeline parts and inspect / test data
 3. write the simplest fully working pipeline possible - make sure everything runs smoothly
+   1. get fundamental and price data
+   2. create very simple features
+   3. fir basic linear model (enet)
+   4. write rebalancing method
 4. focus on factor / feature research
+   1. evaluate factors / features with IC / ICIR in notebook as a start for multiple periods
 
 
 
