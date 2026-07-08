@@ -11,8 +11,8 @@ MONTHLY_REBALANCE = False
 class PCANeutralAlpha(QCAlgorithm):
     def initialize(self) -> None:
         self.add_equity("SPY", Resolution.DAILY)
-        self.set_start_date(2021 if DEBUG else 2000, 1, 1)
-        self.set_end_date(2021 if DEBUG else 2026, 12, 31)
+        self.set_start_date(2021, 1, 1)
+        self.set_end_date(2021, 6, 1)
         self.set_cash(1_000_000)
 
         self.set_brokerage_model(
@@ -31,7 +31,7 @@ class PCANeutralAlpha(QCAlgorithm):
             self.REBALANCE_DAYS = 5
             self.N_TRAIN_WINDOWS = 8
 
-        self.LOOKBACK = 15 if DEBUG else 220
+        self.LOOKBACK = 220
         self.MIN_HISTORY = (
             self.LOOKBACK
             + self.REBALANCE_DAYS * self.N_TRAIN_WINDOWS
@@ -123,7 +123,8 @@ class PCANeutralAlpha(QCAlgorithm):
         for sym in symbols:
             if sym not in raw.index.get_level_values(0):
                 continue
-            result[sym] = raw.loc[sym]
+            subset = raw.loc[sym]
+            result[sym] = subset
         return result
 
     def rebalance_portfolio(self) -> None:
