@@ -2,6 +2,9 @@ from AlgorithmImports import *
 import numpy as np 
 import pandas as pd
 import datetime as dt
+from .helpers import (
+    get_fundamental_history_df,
+)
 
 DEBUG = True
 UNIVERSE_SIZE = 35 if DEBUG else 500
@@ -11,8 +14,8 @@ MONTHLY_REBALANCE = False
 class PCANeutralAlpha(QCAlgorithm):
     def initialize(self) -> None:
         self.add_equity("SPY", Resolution.DAILY)
-        self.set_start_date(2021, 1, 1)
-        self.set_end_date(2021, 6, 1)
+        self.set_start_date(2021 if DEBUG else 2000, 1, 1)
+        self.set_end_date(2021 if DEBUG else 2026, 6, 1)
         self.set_cash(1_000_000)
 
         self.set_brokerage_model(
@@ -141,31 +144,3 @@ class PCANeutralAlpha(QCAlgorithm):
             sym = security.symbol
             if self.portfolio[sym].invested:
                 self.liquidate(sym, tag="universe_removal")
-
-
-def get_fundamental_history_df(fundamental_data_subset):
-    other_relevant_fundamental_cols = [
-        "volume",
-        "marketcap",
-        "market",
-        "hasfundamentaldata",
-        "dollarvolume",
-        "adjustedprice",
-    ]
-    return pd.concat([
-        fundamental_data_subset.apply(get_row_valuation_data, axis=1),
-        fundamental_data_subset[other_relevant_fundamental_cols],
-        ], axis=1
-        )
-
-
-def get_row_valuation_data(row):
-    valuation = row.valuationratios
-    relevant_keys = [
-        "PERatio", "PCFRatio",
-        "PBRatio", "PSRatio", "PEGRatio"
-        ]
-    row_data = {}
-    for key in relevant_keys:
-        row_data[key] = getattr(valuation, key, np.nan) 
-    return pd.Series(row_data)
