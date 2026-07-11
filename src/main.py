@@ -4,6 +4,8 @@ import pandas as pd
 import datetime as dt
 from .helpers import (
     get_fundamental_history_df,
+    filter_universe,
+    filter_tradable_securities,
 )
 
 DEBUG = True
@@ -63,37 +65,16 @@ class PCANeutralAlpha(QCAlgorithm):
         self.set_benchmark("SPY")
 
     def universe_filter(self, fundamentals: list) -> list:
-        filtered = []
-        for f in fundamentals:
-            vr = f.valuation_ratios
-            bs = f.financial_statements.balance_sheet
-            ors = f.operation_ratios
-            if (
-                f.has_fundamental_data
-                and f.market_cap > 1e9
-                and f.price > 5
-                and vr.pe_ratio not in (0, None)
-                and vr.pb_ratio not in (0, None)
-                and ors.roe.value not in (0, None)
-                and bs.total_debt is not None
-                and bs.stockholders_equity is not None
-                and bs.stockholders_equity != 0
-                and f.volume > 0
-                ):
-                filtered.append(f)
-    
-        filtered.sort(key=lambda f: f.dollar_volume, reverse=True)
-        self.symbols = [f.symbol for f in filtered[:self.UNIVERSE_SIZE]]
+        self.symbols = filter_universe(
+            fundamentals, universe_size=self.UNIVERSE_SIZE
+            )
         return self.symbols
 
     def get_tradable_symbols(self) -> list:
         """Return universe symbols that have received at least one price bar."""
-        return [
-            sym for sym in self.symbols
-            if sym in self.securities
-            and self.securities[sym].has_data
-            and self.securities[sym].price > 0
-        ]
+        return filter_tradable_securities(
+            symbols=self.symbols, securities=self.securities
+            )
 
     def get_asset_history(self, symbols: list) -> dict:
         """Batch-fetch daily OHLCV history. Returns {symbol: DataFrame}."""

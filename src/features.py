@@ -21,5 +21,14 @@ def get_upper_shadow(close, high, open):
     return high - np.maximum(close, open)
 
 
+def get_upper_relative_shadow(close, high, open):
+    return get_upper_shadow(close, high, open) / close
+
+
 def get_lower_shadow(close, low, open):
     return np.minimum(close, open) - low
+
+
+def get_lower_relative_shadow(close, low, open):
+    return get_lower_shadow(close, low, open) / close
+

@@ -27,7 +27,8 @@
    1. evaluate factors / features with IC / ICIR in notebook as a start for multiple periods
 
 
-
+## Other todos
+- write the universe filters in a way so we can use them in notebook and algorithm
 
 
 
